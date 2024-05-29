@@ -68,12 +68,49 @@ public class MyHostPingResult
             }
 
             var rtt = 0;
+            var count = 0;
             foreach (var i in _results)
             {
-                rtt += i.Rtt;
+                if (i.Address != null)
+                {
+                    rtt += i.Rtt;
+                    ++count;
+                }
             }
 
-            return rtt / _results.Count;
+            if (count == 0)
+            {
+                return 0;
+            }
+
+            return rtt / count;
+        }
+    }
+
+    public int Jitter
+    {
+        get
+        {
+            var avg = this.AvgRtt;
+            if (avg == -1)
+            {
+                return 0;
+            }
+
+            var jitter = 0;
+            foreach (var i in _results)
+            {
+                if (i.Address != null)
+                {
+                    var iJitter = Math.Abs(i.Rtt - avg);
+                    if (iJitter > jitter)
+                    {
+                        jitter = iJitter;
+                    }
+                }
+            }
+
+            return jitter;
         }
     }
 
@@ -106,7 +143,7 @@ public class MyHostPingResult
         }
 
         _results.Enqueue(pingResult);
-        if (_results.Count > 10)
+        while (_results.Count > 10)
         {
             _results.Dequeue();
         }
@@ -189,7 +226,7 @@ public class MyTracerouteResult
         ConsoleLineEx.Write(_consolePreLines.Count, $"  Sent: {this.GetSentCount()}");
         
         // title
-        ConsoleLineEx.Write(_consolePreLines.Count + 1, $"No.\trtt\tloss\t{GetFormattedIpStr("address")} location");
+        ConsoleLineEx.Write(_consolePreLines.Count + 1, $"No.\tRtt\tJitter\tLoss\t{GetFormattedIpStr("Address")} Location");
         
         // hosts
         var showHostCount = this.GetShowHostCount();
@@ -203,7 +240,7 @@ public class MyTracerouteResult
             }
             else
             {
-                ConsoleLineEx.Write(line, $"{i + 1}\t{host.AvgRtt}ms\t{host.LossPercentStr}\t{GetFormattedIpStr(host.IpString)} {host.Location}"); 
+                ConsoleLineEx.Write(line, $"{i + 1}\t{host.AvgRtt}ms\t{host.Jitter}ms\t{host.LossPercentStr}\t{GetFormattedIpStr(host.IpString)} {host.Location}"); 
             }
         }
         
@@ -212,6 +249,9 @@ public class MyTracerouteResult
         {
             ConsoleLineEx.ClearLine(line);
         }
+        
+        // set cursor
+        ConsoleLineEx.SetCursor(0, _consolePreLines.Count + 2 + showHostCount);
     }
     
     private int GetIpStrMaxLength()

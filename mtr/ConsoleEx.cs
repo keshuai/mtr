@@ -2,6 +2,14 @@
 
 public static class ConsoleLineEx
 {
+    public static void SetCursor(int left, int top)
+    {
+        if (CanWrite(top))
+        {
+            Console.SetCursorPosition(left, top);
+        }
+    }
+
     public static bool CanWrite(int consoleLine)
     {
         return consoleLine >= 0 && consoleLine < Console.BufferHeight;
