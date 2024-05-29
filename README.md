@@ -2,6 +2,8 @@
 
 ​	The C#(NET8) implementation of MTR (My Traceroute).
 
+![image](https://raw.githubusercontent.com/keshuai/mtr/master/img/win_mtr.png)
+
 ### build on windows:
 
 ​	use publish_xxx.bat
