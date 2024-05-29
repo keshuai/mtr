@@ -320,7 +320,7 @@ public class Program
             }
             
             // title
-            ConsoleLineEx.Write(_preLines.Count + 1, $"index\trtt\tloss\t{GetFormattedIpStr("ip")} location");
+            ConsoleLineEx.Write(_preLines.Count + 1, $"index\tround\trtt\tloss\t{GetFormattedIpStr("ip")} location");
             
             // nodes
             for (int i = 0; i < _nodes.Count; i++)
@@ -329,11 +329,11 @@ public class Program
                 var line = _preLines.Count + 2 + i;
                 if (node.ResultCount == 0)
                 {
-                    ConsoleLineEx.Write(line, $"{i + 1}\t*");
+                    ConsoleLineEx.Write(line, $"{i + 1}\t{node.TotalCount}\t*");
                 }
                 else
                 {
-                    ConsoleLineEx.Write(line, $"{i + 1}\t{node.AvgRtt}ms\t{node.LossPercentStr}\t{GetFormattedIpStr(node.IpString)} {node.Location}"); 
+                    ConsoleLineEx.Write(line, $"{i + 1}\t{node.TotalCount}\t{node.AvgRtt}ms\t{node.LossPercentStr}\t{GetFormattedIpStr(node.IpString)} {node.Location}"); 
                 }
             }
             
