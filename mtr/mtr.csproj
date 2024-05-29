@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <OutputType>Exe</OutputType>
+        <LangVersion>default</LangVersion>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained> <!-- 可选，默认值是 true -->
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
+    </ItemGroup>
+
+</Project>
