@@ -309,17 +309,7 @@ public class MyTraceroute
 
     public async void Start()
     {
-        var stopWatch = new Stopwatch();
-        while (true)
-        {
-            stopWatch.Restart();
-            await this.PingAsync(_targetAddress, _maxHops);
-            stopWatch.Stop();
-            
-            var sleep = 1000 - (int)stopWatch.ElapsedMilliseconds;
-            if (sleep > 0)
-                Thread.Sleep(sleep);
-        }
+        await this.PingAsync(_targetAddress, _maxHops);
     }
 
     public async Task PingAsync(IPAddress targetAddress, int maxHops)
@@ -334,38 +324,49 @@ public class MyTraceroute
         var pingTasks = new List<Task<MyPingResult>>(maxHops);
         var targetTtl = -1;
 
+        var stopWatch = new Stopwatch();
         while (true)
         {
-            // 全部并发 ping
-            pingTasks.Clear();
-            for (int i = 0; i < pingList.Count; i++)
+            stopWatch.Restart();
             {
-                var task = pingList[i].PingAsync(targetAddress, i + 1);
-                pingTasks.Add(task);
-            }
-            var results = await Task.WhenAll(pingTasks);
-            
-            // 获取目标节点ttl, 移除多不必要的ping
-            if (targetTtl == -1)
-            {
-                for (int i = 0; i < results.Length; i++)
+                // 全部并发 ping
+                pingTasks.Clear();
+                for (int i = 0; i < pingList.Count; i++)
                 {
-                    if (targetAddress.Equals(results[i].Address))
+                    var task = pingList[i].PingAsync(targetAddress, i + 1);
+                    pingTasks.Add(task);
+                }
+                var results = await Task.WhenAll(pingTasks);
+            
+                // 获取目标节点ttl, 移除多不必要的ping
+                if (targetTtl == -1)
+                {
+                    for (int i = 0; i < results.Length; i++)
                     {
-                        targetTtl = results[i].Ttl;
-                        break;
+                        if (targetAddress.Equals(results[i].Address))
+                        {
+                            targetTtl = results[i].Ttl;
+                            break;
+                        }
+                    }
+
+                    if (targetTtl != -1)
+                    {
+                        pingList.RemoveRange(targetTtl, pingList.Count - targetTtl);
+                        results = CopyResults(results, targetTtl);
                     }
                 }
 
-                if (targetTtl != -1)
-                {
-                    pingList.RemoveRange(targetTtl, pingList.Count - targetTtl);
-                    results = CopyResults(results, targetTtl);
-                }
+                _result.AddPingResults(results);
+                _result.ShowInConsole();
             }
 
-            _result.AddPingResults(results);
-            _result.ShowInConsole();
+            
+            stopWatch.Stop();
+            
+            var sleep = 1000 - (int)stopWatch.ElapsedMilliseconds;
+            if (sleep > 0)
+                Thread.Sleep(sleep);
         }
     }
 
