@@ -56,6 +56,7 @@ public class MyPing : IDisposable
 
     public async Task<MyPingResult> PingAsync(IPAddress target, int ttl)
     {
+        await Task.Delay(1); // for rtt jitter
         _pingOptions.Ttl = ttl;
         _stopwatch.Restart();
         var pingReply = await _pingSender.SendPingAsync(target, _timeout, SharedPingBuffer, _pingOptions);
