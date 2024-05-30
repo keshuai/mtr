@@ -61,7 +61,18 @@ public class MyPing : IDisposable
         var pingReply = await _pingSender.SendPingAsync(target, _timeout, SharedPingBuffer, _pingOptions);
         _stopwatch.Stop();
         var rtt = (int)_stopwatch.ElapsedMilliseconds;
-        var address = pingReply.Status == IPStatus.TimedOut ? null : pingReply.Address;
+        
+        IPAddress address = null;
+        
+        if (pingReply.Status == IPStatus.Success) // local address ipv6%number
+        {
+            address = target;
+        }
+        else if (pingReply.Status == IPStatus.TtlExpired)
+        {
+            address = pingReply.Address;
+        }
+        
         return new MyPingResult(ttl, address, rtt, GeoIP.Ins.IPLocation(address));
     }
 }
