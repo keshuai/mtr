@@ -32,17 +32,18 @@ public class LinuxTraceroute
         
         this.ShowLoop();
 
-        var hosts = new string[31];
+        var hosts = new string[30];
         while (true)
         {
-            for (int i = 1; i < 31; ++i)
+            for (int i = 0; i < hosts.Length; ++i)
             {
                 if (hosts[i] != null)
                 {
                     continue;
                 }
 
-                var host = await LinuxPing.GetHost(target, i);
+                var ttl = i + 1;
+                var host = await LinuxPing.GetHost(target, ttl);
                 if (string.IsNullOrEmpty(host))
                 {
                     continue;
@@ -56,7 +57,7 @@ public class LinuxTraceroute
                     return;
                 }
 
-                var hostObj = new LinuxHost(i, hostAddress, host);
+                var hostObj = new LinuxHost(ttl, hostAddress, host);
                 lock (_hostsToAdd)
                 {
                     _hostsToAdd.Add(hostObj);
@@ -65,13 +66,44 @@ public class LinuxTraceroute
                 // 目标节点已经找到
                 if (host == targetAddress)
                 {
-                    return;
+                    hosts = ResetHosts(hosts, i + 1);
+                    break;
                 }
+            }
+
+            // 所有节点主机全部找到
+            if (AllHostFound(hosts))
+            {
+                return;
             }
         }
 
     }
-    
+
+    private static string[] ResetHosts(string[] hosts, int count)
+    {
+        var array = new string[count];
+        for (int i = 0; i < count; i++)
+        {
+            array[i] = hosts[i];
+        }
+
+        return array;
+    }
+
+    private static bool AllHostFound(string[] hosts)
+    {
+        foreach (var host in hosts)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     private async void ShowLoop()
     {
         while (true)
@@ -114,7 +146,7 @@ public class LinuxTraceroute
         }
         
         // title
-        ConsoleLineEx.Write(_consolePreLines.Count, $"No.\tSent\tRtt\tJitter\tLoss\t{GetFormattedIpStr("Address")} Location");
+        ConsoleLineEx.Write(_consolePreLines.Count, $"No.\tRtt\tJitter\tLoss\tSent\t{GetFormattedIpStr("Address")} Location");
         
         // hosts
         for (int i = 0; i < _hosts.Count; i++)
@@ -127,7 +159,7 @@ public class LinuxTraceroute
             }
             else
             {
-                ConsoleLineEx.Write(line, $"{i + 1}\t{host.TotalCount}\t{host.AvgRtt}ms\t{host.Jitter}ms\t{host.LossPercentStr}\t{GetFormattedIpStr(host.IpString)} {host.Location}"); 
+                ConsoleLineEx.Write(line, $"{i + 1}\t{host.AvgRtt}ms\t{host.Jitter}ms\t{host.LossPercentStr}\t{host.TotalCount}\t{GetFormattedIpStr(host.IpString)} {host.Location}"); 
             }
         }
 
