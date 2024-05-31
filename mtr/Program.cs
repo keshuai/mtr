@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.InteropServices;
 
 namespace mtr;
 
@@ -13,7 +14,31 @@ public class Program
             var asnDb = Path.Combine(baseDir, "GeoLite2-ASN.mmdb");
             GeoIP.Ins.Reload(cityDb, asnDb);
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            RunOnLinux(args);
+        }
+        else
+        {
+            RunDefault(args);
+        }
+    }
+
+    static void RunOnLinux(string[] args)
+    {
+        if (args.Length != 1)
+        {
+            Console.WriteLine("Invalid target.\nuse mtr xxx");
+            return;
+        }
         
+        new LinuxTraceroute().Start(args[0]);
+        Thread.CurrentThread.Join();
+    }
+
+    static void RunDefault(string[] args)
+    {
         var target = GetTarget(args); // 目标域名或IP地址
         if (target == null)
         {
@@ -33,10 +58,10 @@ public class Program
 
         var myTraceroute = new MyTraceroute(target, targetAddress, maxHops);
         myTraceroute.Start();
-
+        
         Thread.CurrentThread.Join();
     }
-    
+
     static string GetTarget(string[] args)
     {
         if (args.Length == 0)

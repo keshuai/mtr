@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mtr", "mtr\mtr.csproj", "{A0580979-D714-4ADD-81D0-2F2A300E814C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ping", "ping\ping.csproj", "{86828248-41BB-4249-8934-E23E90E02FBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A0580979-D714-4ADD-81D0-2F2A300E814C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0580979-D714-4ADD-81D0-2F2A300E814C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0580979-D714-4ADD-81D0-2F2A300E814C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86828248-41BB-4249-8934-E23E90E02FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86828248-41BB-4249-8934-E23E90E02FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86828248-41BB-4249-8934-E23E90E02FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86828248-41BB-4249-8934-E23E90E02FBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
